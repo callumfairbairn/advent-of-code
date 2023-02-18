@@ -12,10 +12,10 @@ class MinAndIndex {
     }
 }
 
-class CalorieCache {
+class ElfGroup {
     int[] store;
 
-    public CalorieCache(int size) {
+    public ElfGroup(int size) {
         this.store = new int[size];
         Arrays.fill(this.store, 0);
     }
@@ -48,29 +48,29 @@ public class Day01 {
     private static final List<String> testInput = UtilsKt.readInput("Day01_test");
     private static final List<String> realInput = UtilsKt.readInput("Day01");
 
-    private static int getAnswer(@NotNull List<String> input, int sizeOfCache) {
-        CalorieCache calorieCache = new CalorieCache(sizeOfCache);
+    private static ElfGroup findNHighestCalorieElves(@NotNull List<String> input, int n) {
+        ElfGroup elvesWithMostCalories = new ElfGroup(n);
         ArrayList<String> currentCalories = new ArrayList<>();
 
         for (String calorie: input) {
             if (Objects.equals(calorie, "")) {
-                int currentCalorieSum = currentCalories.stream().mapToInt(Integer::parseInt).sum();
-                calorieCache.add(currentCalorieSum);
+                int currentElf = currentCalories.stream().mapToInt(Integer::parseInt).sum();
+                elvesWithMostCalories.add(currentElf);
                 currentCalories = new ArrayList<>();
             } else {
                 currentCalories.add(calorie);
             }
         }
 
-        return calorieCache.sum();
+        return elvesWithMostCalories;
     };
 
     private static int part1(List<String> input) {
-        return getAnswer(input, 1);
+        return findNHighestCalorieElves(input, 1).sum();
     }
 
     private static int part2(List<String> input) {
-        return getAnswer(input, 3);
+        return findNHighestCalorieElves(input, 3).sum();
     }
 
     public static void main(String[] args) {
