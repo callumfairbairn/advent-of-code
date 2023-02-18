@@ -31,54 +31,27 @@ class Rock extends Move {
     public int getValue() {
         return 1;
     }
-
-    public Move winsAgainst() {
-        return new Scissors();
-    }
-
-    public Move losesAgainst() {
-        return new Paper();
-    }
-
-    public Move drawsAgainst() {
-        return new Rock();
-    }
+    public Move winsAgainst() { return new Scissors(); }
+    public Move losesAgainst() { return new Paper(); }
+    public Move drawsAgainst() { return new Rock(); }
 }
 
 class Paper extends Move {
     public int getValue() {
         return 2;
     }
-
-    public Move winsAgainst() {
-        return new Rock();
-    }
-
-    public Move losesAgainst() {
-        return new Scissors();
-    }
-
-    public Move drawsAgainst() {
-        return new Paper();
-    }
+    public Move winsAgainst() { return new Rock(); }
+    public Move losesAgainst() { return new Scissors(); }
+    public Move drawsAgainst() { return new Paper(); }
 }
 
 class Scissors extends Move {
     public int getValue() {
         return 3;
     }
-
-    public Move winsAgainst() {
-        return new Paper();
-    }
-
-    public Move losesAgainst() {
-        return new Rock();
-    }
-
-    public Move drawsAgainst() {
-        return new Scissors();
-    }
+    public Move winsAgainst() { return new Paper(); }
+    public Move losesAgainst() { return new Rock(); }
+    public Move drawsAgainst() { return new Scissors(); }
 }
 
 public class Day02 {
