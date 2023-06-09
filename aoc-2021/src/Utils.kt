@@ -21,3 +21,23 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
 fun Any?.println() = println(this)
 
 data class Coordinate(val x: Int, val y: Int)
+
+inline fun <reified T> transpose(xs: Array<Array<T>>): Array<Array<T>> {
+    val cols = xs[0].size
+    val rows = xs.size
+    return Array(cols) { j ->
+        Array(rows) { i ->
+            xs[i][j]
+        }
+    }
+}
+
+inline fun <reified T> transpose(xs: List<List<T>>): List<List<T>> {
+    val cols = xs[0].size
+    val rows = xs.size
+    return List(cols) { j ->
+        List(rows) { i ->
+            xs[i][j]
+        }
+    }
+}
