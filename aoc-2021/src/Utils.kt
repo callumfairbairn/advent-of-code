@@ -20,8 +20,10 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
  */
 fun Any?.println() = println(this)
 
+// Coordinate data class
 data class Coordinate(val x: Int, val y: Int)
 
+// transpose Array
 inline fun <reified T> transpose(xs: Array<Array<T>>): Array<Array<T>> {
     val cols = xs[0].size
     val rows = xs.size
@@ -32,6 +34,7 @@ inline fun <reified T> transpose(xs: Array<Array<T>>): Array<Array<T>> {
     }
 }
 
+// transpose List
 inline fun <reified T> transpose(xs: List<List<T>>): List<List<T>> {
     val cols = xs[0].size
     val rows = xs.size
@@ -40,4 +43,10 @@ inline fun <reified T> transpose(xs: List<List<T>>): List<List<T>> {
             xs[i][j]
         }
     }
+}
+
+// count up or down e.g. 1 toward 100 or 100 toward 1
+infix fun Int.toward(to: Int): IntProgression {
+    val step = if (this > to) -1 else 1
+    return IntProgression.fromClosedRange(this, to, step)
 }
