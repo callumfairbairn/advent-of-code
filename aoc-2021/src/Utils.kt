@@ -50,6 +50,11 @@ inline fun <reified T> transpose(xs: List<List<T>>): List<List<T>> {
     }
 }
 
+// product of List
+fun List<Int>.product(): Int {
+    return reduce { acc, i -> acc * i }
+}
+
 // count up or down e.g. 1 toward 100 or 100 toward 1
 infix fun Int.toward(to: Int): IntProgression {
     val step = if (this > to) -1 else 1
