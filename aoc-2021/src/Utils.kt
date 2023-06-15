@@ -16,6 +16,11 @@ fun String.md5() = BigInteger(1, MessageDigest.getInstance("MD5").digest(toByteA
     .padStart(32, '0')
 
 /**
+ * Alphabetizes string.
+ */
+fun String.alphabetized() = String(toCharArray().apply { sort() })
+
+/**
  * The cleaner shorthand for printing output.
  */
 fun Any?.println() = println(this)
