@@ -1,6 +1,7 @@
 import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.math.floor
 
 /**
  * Reads lines from the given input txt file.
@@ -53,6 +54,11 @@ inline fun <reified T> transpose(xs: List<List<T>>): List<List<T>> {
 // product of List
 fun List<Int>.product(): Int {
     return reduce { acc, i -> acc * i }
+}
+
+// middle of list
+fun List<BigInteger>.middle(): BigInteger {
+    return this[floor(size / 2.00).toInt()]
 }
 
 // count up or down e.g. 1 toward 100 or 100 toward 1
