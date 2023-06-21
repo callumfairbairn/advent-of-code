@@ -48,7 +48,7 @@ fun getScoreAndCorruptedStatus(line: String): Pair<BigInteger, Boolean> {
     return Pair(getAutocompleteScore(stack), false)
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): BigInteger {
         return input.map { line -> getScoreAndCorruptedStatus(line) }.filter { (_, isCorrupted) -> isCorrupted }
             .sumOf { (score, _) -> score }

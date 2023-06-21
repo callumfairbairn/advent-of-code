@@ -37,7 +37,7 @@ fun getNumberOfFishByDays(input: List<String>, days: Int): BigInteger {
     return fishMap.values.sumOf { it }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): BigInteger {
         return getNumberOfFishByDays(input, 80)
     }

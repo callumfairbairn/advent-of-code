@@ -47,7 +47,7 @@ class Submarine(private val navSystemMap: NavSystemMap) {
 }
 
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val navSystem = BasicNavSystem()
         val submarine = Submarine(navSystem.map)

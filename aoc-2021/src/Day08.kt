@@ -32,7 +32,7 @@ private fun String.countChars(): Map<Char, Int> {
     return charCountMap
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val uniqueLengths = listOf(2, 3, 4, 7)
         var counter = 0

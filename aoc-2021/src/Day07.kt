@@ -8,7 +8,7 @@ private fun triangle(n: Int): Int {
     return n * nPlusOne / 2
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val xValues = input[0].split(',').map { it.toInt() }.sorted()
         val min = xValues.min()

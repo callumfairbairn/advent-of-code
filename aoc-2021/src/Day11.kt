@@ -89,7 +89,7 @@ class Grid(val input: List<String>) {
     }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val grid = Grid(input)
         grid.setAllNeighbours()

@@ -16,7 +16,7 @@ private fun getGammaAndEpsilon(input: List<String>): Pair<String, String> {
     return Pair(gamma, epsilon)
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val (gamma, epsilon) = getGammaAndEpsilon(input)
         return gamma.toInt(2) * epsilon.toInt(2)

@@ -70,7 +70,7 @@ private fun processVertical(
 
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val uniqueCoordinates = mutableSetOf<Coordinate>()
         val duplicateCoordinates = mutableSetOf<Coordinate>()

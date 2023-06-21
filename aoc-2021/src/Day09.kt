@@ -25,7 +25,7 @@ private fun getLowPoints(cave: List<List<Int>>): List<Coordinate> {
     return lowPoints
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val cave = input.map { row -> row.map { it.toString().toInt() } }
         val lowPoints = getLowPoints(cave)

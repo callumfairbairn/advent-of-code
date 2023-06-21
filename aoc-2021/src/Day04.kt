@@ -63,7 +63,7 @@ private class Board(rawRows: List<String>) {
     }
 }
 
-fun main(args: Array<String>) {
+fun main() {
     fun part1(input: List<String>): Int {
         val numbers = input[0].split(",").map { it.toInt() }
         val boards = splitRawInputIntoBoards(input)

@@ -31,7 +31,7 @@ private fun part2(input: List<String>): Int {
     return count
 }
 
-fun main(args: Array<String>) {
+fun main() {
     println(part1(testInput))
     println(part1(realInput))
     println(part2(testInput))
