@@ -35,7 +35,7 @@ fun getAutocompleteScore(remainingCharacters: Stack<Char>): BigInteger {
 
 fun getScoreAndCorruptedStatus(line: String): Pair<BigInteger, Boolean> {
     val stack = Stack<Char>()
-    line.forEachIndexed { index, char ->
+    line.forEach { char ->
         if (char in openToCloseMap.keys) {
             stack.add(char)
         } else {
