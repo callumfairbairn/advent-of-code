@@ -22,47 +22,49 @@ class Cave(val name: String) {
     }
 }
 
-class CaveSystem(input: List<String>) {
+class CaveSystem(val input: List<String>) {
     private val caves = mutableSetOf<Cave>()
 
     fun getCave(name: String): Cave {
         return caves.find { it.name == name }!!
     }
 
-    fun initiateCaveSystem(input: List<String>) {
+    fun initiateCaveSystem() {
         input.forEach { line ->
             line.split("-").forEach { caves.add(Cave(it)) }
         }
         input.forEach { line ->
             val (cave1, cave2) = line.split("-").map { getCave(it) }
-            if(cave2.name != "start") { cave1.addConnection(cave2) }
-            if(cave1.name != "start") { cave2.addConnection(cave1) }
+            if (cave2.name != "start") {
+                cave1.addConnection(cave2)
+            }
+            if (cave1.name != "start") {
+                cave2.addConnection(cave1)
+            }
         }
     }
 
     fun getAllPaths(
         start: Cave,
-        allPaths: MutableSet<MutableList<Cave>> = mutableSetOf(),
-        currentPath: MutableList<Cave> = mutableListOf(start),
-    ): MutableSet<MutableList<Cave>> {
+        allPaths: Set<List<Cave>> = mutableSetOf(),
+        currentPath: List<Cave> = mutableListOf(start),
+    ): Set<List<Cave>> {
         if (start == getCave("end")) {
-            allPaths.add(currentPath)
-            return allPaths
+            return setOf(currentPath)
         }
         val possibleNeighbors = start.connections.filter { it.bigCave || !currentPath.contains(it) }
-        val newPaths = possibleNeighbors.map { getAllPaths(it, allPaths, (currentPath + it).toMutableList()) }
-        return newPaths.flatten().toMutableSet()
+        val newPaths = possibleNeighbors.map { getAllPaths(it, allPaths, currentPath + it) }
+        return allPaths + newPaths.flatten()
     }
 
     fun getAllPaths2(
         start: Cave,
-        allPaths: MutableSet<MutableList<Cave>> = mutableSetOf(),
-        currentPath: MutableList<Cave> = mutableListOf(start),
+        allPaths: Set<List<Cave>> = mutableSetOf(),
+        currentPath: List<Cave> = mutableListOf(start),
         beenToASmallCaveTwice: Boolean = false,
-    ): MutableSet<MutableList<Cave>> {
+    ): Set<List<Cave>> {
         if (start == getCave("end")) {
-            allPaths.add(currentPath)
-            return allPaths
+            return setOf(currentPath)
         }
         val hasBeenToASmallCaveTwice = beenToASmallCaveTwice ||
                 currentPath
@@ -77,31 +79,32 @@ class CaveSystem(input: List<String>) {
             getAllPaths2(
                 it,
                 allPaths,
-                (currentPath + it).toMutableList(),
+                currentPath + it,
                 hasBeenToASmallCaveTwice
             )
         }
-        return newPaths.flatten().toMutableSet()
+        return allPaths + newPaths.flatten()
     }
+
 }
 
 fun main() {
     fun part1(input: List<String>): Int {
         val caveSystem = CaveSystem(input)
-        caveSystem.initiateCaveSystem(input)
+        caveSystem.initiateCaveSystem()
         val allPaths = caveSystem.getAllPaths(caveSystem.getCave("start"))
         return allPaths.size
     }
 
     fun part2(input: List<String>): Int {
         val caveSystem = CaveSystem(input)
-        caveSystem.initiateCaveSystem(input)
+        caveSystem.initiateCaveSystem()
         val allPaths = caveSystem.getAllPaths2(caveSystem.getCave("start"))
         return allPaths.size
     }
 
-//    println(part1(testInput))
-//    println(part1(realInput))
+    println(part1(testInput))
+    println(part1(realInput))
     println(part2(testInput))
     println(part2(realInput))
 }
