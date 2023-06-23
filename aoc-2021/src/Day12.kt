@@ -22,8 +22,10 @@ class Cave(val name: String) {
     }
 }
 
+
 class CaveSystem(val input: List<String>) {
     private val caves = mutableSetOf<Cave>()
+    val allPaths = mutableSetOf<List<Cave>>()
 
     fun getCave(name: String): Cave {
         return caves.find { it.name == name }!!
@@ -44,63 +46,52 @@ class CaveSystem(val input: List<String>) {
         }
     }
 
-    fun getAllPaths(
+    private fun calculateVisitedASmallCaveTwice(path: List<Cave>): Boolean {
+        return path
+            .filter { it != Cave("start") && !it.bigCave }
+            .groupingBy { it }
+            .eachCount()
+            .values.all { it < 2 }
+    }
+
+    private fun filterInelligibleCaves(currentPath: List<Cave>, smallCavesAllowed: Boolean): (Cave) -> Boolean {
+        return { it -> it.bigCave || smallCavesAllowed || !currentPath.contains(it) }
+    }
+
+    fun calculateAllPaths(
         start: Cave,
-        allPaths: Set<List<Cave>> = mutableSetOf(),
         currentPath: List<Cave> = mutableListOf(start),
-    ): Set<List<Cave>> {
-        if (start == getCave("end")) {
-            return setOf(currentPath)
-        }
+    ): List<Cave>? {
+        if (start == getCave("end")) { return currentPath }
         val possibleNeighbors = start.connections.filter { it.bigCave || !currentPath.contains(it) }
-        val newPaths = possibleNeighbors.map { getAllPaths(it, allPaths, currentPath + it) }
-        return allPaths + newPaths.flatten()
+        possibleNeighbors.mapNotNull { calculateAllPaths(it, currentPath + it) }.forEach { allPaths.add(it) }
+        return null
     }
 
-    fun getAllPaths2(
+    fun calculateAllPaths2(
         start: Cave,
-        allPaths: Set<List<Cave>> = mutableSetOf(),
         currentPath: List<Cave> = mutableListOf(start),
-        beenToASmallCaveTwice: Boolean = false,
-    ): Set<List<Cave>> {
-        if (start == getCave("end")) {
-            return setOf(currentPath)
-        }
-        val hasBeenToASmallCaveTwice = beenToASmallCaveTwice ||
-                currentPath
-                    .filter { it != Cave("start") && !it.bigCave }
-                    .groupingBy { it }
-                    .eachCount()
-                    .values.any { it > 1 }
-        val possibleNeighbors = start.connections.filter {
-            it.bigCave || !hasBeenToASmallCaveTwice || !currentPath.contains(it)
-        }
-        val newPaths = possibleNeighbors.map {
-            getAllPaths2(
-                it,
-                allPaths,
-                currentPath + it,
-                hasBeenToASmallCaveTwice
-            )
-        }
-        return allPaths + newPaths.flatten()
+    ): List<Cave>? {
+        if (start == getCave("end")) { return currentPath }
+        val smallCavesAllowed = calculateVisitedASmallCaveTwice(currentPath)
+        val possibleNeighbors = start.connections.filter(filterInelligibleCaves(currentPath, smallCavesAllowed))
+        possibleNeighbors.mapNotNull { calculateAllPaths2(it, currentPath + it) }.forEach { allPaths.add(it) }
+        return null
     }
-
 }
-
 fun main() {
     fun part1(input: List<String>): Int {
         val caveSystem = CaveSystem(input)
         caveSystem.initiateCaveSystem()
-        val allPaths = caveSystem.getAllPaths(caveSystem.getCave("start"))
-        return allPaths.size
+        caveSystem.calculateAllPaths(caveSystem.getCave("start"))
+        return caveSystem.allPaths.size
     }
 
     fun part2(input: List<String>): Int {
         val caveSystem = CaveSystem(input)
         caveSystem.initiateCaveSystem()
-        val allPaths = caveSystem.getAllPaths2(caveSystem.getCave("start"))
-        return allPaths.size
+        caveSystem.calculateAllPaths2(caveSystem.getCave("start"))
+        return caveSystem.allPaths.size
     }
 
     println(part1(testInput))
