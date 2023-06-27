@@ -21,16 +21,54 @@ fun getHistogram(template: String): Map<Char, Int> {
     return histogram
 }
 
+
 fun getTemplateAfterSteps(input: List<String>, steps: Int): String {
     var (template, rules) = getTemplateAndRules(input)
-    for (i in 0 until steps) {
-        var newTemplate = ""
-        for (j in 0 until template.length - 1) {
-            val (char1, char2) = Pair(template[j].toString(), template[j + 1].toString())
-            val key = char1 + char2
-            newTemplate += "$char1${rules[key]}"
+    val substringMap = mutableMapOf<String, String>()
+
+    fun getNewValueForSubstring(substring: String): String {
+        // TODO: Store chunks of strings rather than one string
+
+        if (substring.length == 1) {
+            throw Exception("Substring cannot be of length 1")
         }
-        template = newTemplate + template.last()
+        if (substring in substringMap) {
+            return substringMap[substring]!!
+        }
+        if (substring.length < 8) {
+            var newTemplate = ""
+            for (j in 0 until substring.length - 1) {
+                val (char1, char2) = Pair(substring[j].toString(), substring[j + 1].toString())
+                val key = char1 + char2
+                newTemplate += "$char1${rules[key]}"
+            }
+            val result = newTemplate + substring.last()
+            substringMap[substring] = result
+            return result
+        }
+
+        if (substringMap.containsKey(substring)) {
+            return substringMap[substring]!!
+        }
+        val middleIndex = substring.length / 2
+        val (part1, part2, part3) = Triple(
+            substring.slice(0 until middleIndex),
+            substring.slice(middleIndex - 1 .. middleIndex),
+            substring.slice(middleIndex until substring.length)
+        )
+        val part1Result = getNewValueForSubstring(part1)
+        val part2Result = getNewValueForSubstring(part2)
+        val part3Result = getNewValueForSubstring(part3)
+        substringMap[part1] = part1Result
+        substringMap[part3] = part3Result
+        // TODO: store result as a list (of chunks) rather than a string to avoid heap overflow
+        val overallResult = "${part1Result.dropLast(1)}${part2Result.dropLast(1)}$part3Result"
+        substringMap[substring] = overallResult
+        return overallResult
+    }
+
+    for (step in 0 until steps) {
+        template = getNewValueForSubstring(template)
     }
     return template
 }
@@ -51,5 +89,5 @@ fun main() {
     println(part1(testInput))
     println(part1(realInput))
     println(part2(testInput))
-    println(part2(realInput))
+//    println(part2(realInput))
 }
