@@ -3,73 +3,80 @@
 private val testInput = readInput("Day14_test")
 private val realInput = readInput("Day14")
 
-fun getTemplateAndRules(input: List<String>): Pair<String, Map<String, String>> {
-    val template = input[0]
+private fun getTemplateAndRules(input: List<String>): Pair<List<String>, MutableMap<String, String>> {
+    val template = listOf(input[0])
     val rules = mutableMapOf<String, String>()
     input.drop(2).forEach {
-        val split = it.split(" -> ")
-        rules[split[0]] = split[1]
+        val comboAndAdditive = it.split(" -> ")
+        val combo = comboAndAdditive[0].split("").filter { stuff -> stuff.isNotEmpty() }
+        val additive = comboAndAdditive[1]
+        rules[combo.joinToString("")] = "${combo[0]}$additive${combo[1]}"
     }
     return Pair(template, rules)
 }
 
-fun getHistogram(template: String): Map<Char, Int> {
+private fun getHistogram(template: List<String>): Map<Char, Int> {
     val histogram = mutableMapOf<Char, Int>()
-    for (char in template.toCharArray().toSet()) {
-        histogram[char] = template.count { it == char }
+    template.forEachIndexed { index, substring ->
+        val thisSubstring = if (index == template.size - 1) substring else substring.dropLast(1)
+        for (char in thisSubstring.toCharArray().toSet()) {
+            val count = thisSubstring.count { it == char }
+            if (histogram[char] == null) {
+                histogram[char] = count
+            } else {
+                histogram[char] = histogram[char]!! + count
+            }
+        }
     }
     return histogram
 }
 
-
-fun getTemplateAfterSteps(input: List<String>, steps: Int): String {
+private fun getTemplateAfterSteps(input: List<String>, steps: Int): List<String> {
     var (template, rules) = getTemplateAndRules(input)
-    val substringMap = mutableMapOf<String, String>()
 
-    fun getNewValueForSubstring(substring: String): String {
-        // TODO: Store chunks of strings rather than one string
-
-        if (substring.length == 1) {
-            throw Exception("Substring cannot be of length 1")
-        }
-        if (substring in substringMap) {
-            return substringMap[substring]!!
-        }
-        if (substring.length < 8) {
-            var newTemplate = ""
-            for (j in 0 until substring.length - 1) {
-                val (char1, char2) = Pair(substring[j].toString(), substring[j + 1].toString())
-                val key = char1 + char2
-                newTemplate += "$char1${rules[key]}"
+    fun getNewValueForSubstring(substring: String): List<String> {
+        var newTemplate = ""
+        var (i, j) = Pair(0, 1)
+        if (rules.contains(substring)) {
+            newTemplate = rules[substring]!!
+        } else {
+            while (i < substring.length && j < substring.length) {
+                val thisSubstring = substring.substring(i, j + 1)
+                if (!rules.contains(thisSubstring)) {
+                    val lastSubstringResult = rules[substring.substring(i, j)]!!
+                    val newKey = substring.substring(j - 1, j + 1)
+                    val thisResult = "${lastSubstringResult.dropLast(1)}${rules[newKey]!!}"
+                    rules[thisSubstring] = thisResult
+                    newTemplate += if (j == substring.length - 1) {
+                        thisResult
+                    } else {
+                        thisResult.dropLast(1)
+                    }
+                    i = j
+                    j = i + 1
+                } else if (j == substring.length - 1) {
+                    newTemplate += rules[thisSubstring]!!
+                    j++
+                }
+                else {
+                    j++
+                }
             }
-            val result = newTemplate + substring.last()
-            substringMap[substring] = result
-            return result
         }
-
-        if (substringMap.containsKey(substring)) {
-            return substringMap[substring]!!
+        if (newTemplate.length > 500) {
+            val newTemplate1 = newTemplate.substring(0, newTemplate.length / 2 + 1)
+            val newTemplate2 = newTemplate.substring(newTemplate.length / 2)
+            return listOf(newTemplate1, newTemplate2)
         }
-        val middleIndex = substring.length / 2
-        val (part1, part2, part3) = Triple(
-            substring.slice(0 until middleIndex),
-            substring.slice(middleIndex - 1 .. middleIndex),
-            substring.slice(middleIndex until substring.length)
-        )
-        val part1Result = getNewValueForSubstring(part1)
-        val part2Result = getNewValueForSubstring(part2)
-        val part3Result = getNewValueForSubstring(part3)
-        substringMap[part1] = part1Result
-        substringMap[part3] = part3Result
-        // TODO: store result as a list (of chunks) rather than a string to avoid heap overflow
-        val overallResult = "${part1Result.dropLast(1)}${part2Result.dropLast(1)}$part3Result"
-        substringMap[substring] = overallResult
-        return overallResult
+        return listOf(newTemplate)
     }
 
     for (step in 0 until steps) {
-        template = getNewValueForSubstring(template)
+        "step: $step, template length: ${template.sumOf { it.length }}".println()
+        val newTemplate = template.map { getNewValueForSubstring(it) }.toList().flatten()
+        template = newTemplate
     }
+    "Finished...".println()
     return template
 }
 
@@ -88,6 +95,6 @@ fun main() {
 
     println(part1(testInput))
     println(part1(realInput))
-    println(part2(testInput))
+//    println(part2(testInput))
 //    println(part2(realInput))
 }
