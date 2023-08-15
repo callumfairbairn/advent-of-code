@@ -1,34 +1,35 @@
+import com.github.mm.coloredconsole.colored
+
 private val testInput = readInput("Day15_test")
 private val realInput = readInput("Day15")
 
-private fun addWhitespace(string: String, x: Int): String {
-    var newString = string
-    for (thing in 0 until x) {
-        newString += " "
-    }
-    return newString
-}
-
-private data class Node(val coord: Coordinate, val riskOnDiscovery: Int, val pathOnDiscovery: List<Coordinate>) {
-    override fun equals(other: Any?): Boolean {
-        if (other !is Node) {
-            return false
-        }
-        return other.coord == coord
-    }
-
-    override fun hashCode(): Int {
-        return coord.hashCode()
-    }
-}
 
 fun main() {
-    fun part1(input: List<String>, maxIntSize: Int): Int {
-        val cave = input.map { row -> row.map { it.toString().toInt() } }
-        val endLocation = Coordinate(cave[0].size - 1, cave.size - 1)
-        val startingRisk = cave[0][0]
+    data class Node(val coord: Coordinate, val riskOnDiscovery: Int, val pathOnDiscovery: List<Coordinate>) {
+        override fun equals(other: Any?): Boolean {
+            if (other !is Node) {
+                return false
+            }
+            return other.coord == coord
+        }
 
-        fun getPossibleMoves(node: Node, visited: Set<Coordinate>): List<Node> {
+        override fun hashCode(): Int {
+            return coord.hashCode()
+        }
+    }
+
+    class ChitinCave(input: List<String>) {
+        val cave = input.map { row -> row.map { it.toString().toInt() } }
+        val maxX = cave.size - 1
+        val maxY = cave[0].size - 1
+        val xIndices = cave.indices
+        val yIndices = cave[0].indices
+
+        operator fun get(coord: Coordinate): Int {
+            return cave[coord.x][coord.y]
+        }
+
+        fun getNextNodes(node: Node, visited: Set<Coordinate>): List<Node> {
             val (x, y) = node.coord
             val neighbourCoords = setOf(
                 Coordinate(x, y - 1),
@@ -36,65 +37,74 @@ fun main() {
                 Coordinate(x - 1, y),
                 Coordinate(x + 1, y),
             )
-            return neighbourCoords.filter {
-                it.x in cave.indices &&
-                        it.y in cave[0].indices &&
-                        !visited.contains(it)
-            }.map { Node(it, cave[it.x][it.y] + node.riskOnDiscovery, node.pathOnDiscovery + it) }
+            return neighbourCoords.filter { it.x in xIndices && it.y in yIndices && !visited.contains(it) }
+                .map { Node(it, this[it] + node.riskOnDiscovery, node.pathOnDiscovery + it) }
+        }
+    }
+
+    class NodeLog(val cave: ChitinCave, val startNode: Node) {
+        val log = mutableMapOf(startNode.coord to startNode)
+        val visited = log.keys
+        fun add(node: Node) {
+            log[node.coord] = node
         }
 
-        fun getShortestPathMap(): Map<Coordinate, Node> {
-            val initialNode = Node(endLocation, startingRisk, listOf(endLocation))
-            val shortestPathMap = mutableMapOf(endLocation to initialNode)
-            var possibleMoves = ArrayDeque(getPossibleMoves(initialNode, shortestPathMap.keys).sortedBy { it.riskOnDiscovery })
+        fun populate() {
+            var nodeQueue = ArrayDeque(cave.getNextNodes(startNode, this.visited).sortedBy { it.riskOnDiscovery })
             var reachedEnd = false
 
             while (!reachedEnd) {
-                val nextMove = possibleMoves.removeFirst()
+                val currentNode = nodeQueue.removeFirst()
 
-                if (nextMove.coord == Coordinate(0, 0)) {
+                if (currentNode.coord == Coordinate(0, 0)) {
                     reachedEnd = true
                 }
 
-                shortestPathMap[nextMove.coord] = nextMove
+                this.add(currentNode)
 
-                val nextMoves = getPossibleMoves(nextMove, shortestPathMap.keys)
-                possibleMoves.addAll(nextMoves)
-                possibleMoves = ArrayDeque(possibleMoves.sortedBy { it.riskOnDiscovery }.toSet())
+                val nextNodes = cave.getNextNodes(currentNode, this.visited)
+                nodeQueue.addAll(nextNodes)
+                nodeQueue = ArrayDeque(nodeQueue.toSet().sortedBy { it.riskOnDiscovery })
             }
-
-            return shortestPathMap
         }
 
-        fun printShortestPathMap(shortestPathMap: Map<Coordinate, Node>) {
-            val maxX = shortestPathMap.keys.maxOf { it.x }
-            val maxY = shortestPathMap.keys.maxOf { it.y }
-            for (x in 0..maxY) {
-                for (y in 0..maxX) {
+        fun getLowestRisk() = log[Coordinate(0, 0)]!!.riskOnDiscovery - cave[Coordinate(0, 0)]
+
+        fun print() {
+            val shortestPath = log[Coordinate(0, 0)]!!.pathOnDiscovery
+            for (x in 0..cave.maxX) {
+                for (y in 0..cave.maxY) {
                     val coord = Coordinate(x, y)
-                    val value = shortestPathMap[coord]
-                    if (value != null) {
-                        val risk = value.riskOnDiscovery.toString()
-                        print(addWhitespace(risk, maxIntSize + 1 - risk.length))
+                    val risk = cave[coord].toString()
+                    if (coord in shortestPath) {
+                        colored { print("$risk ".blue.bold) }
                     } else {
-                        print(addWhitespace("X", maxIntSize))
+                        print("$risk ")
                     }
                 }
-                println()
+                kotlin.io.println()
             }
         }
+    }
 
-        val shortestPathMap = getShortestPathMap()
-        printShortestPathMap(shortestPathMap)
-        return shortestPathMap[Coordinate(0, 0)]!!.riskOnDiscovery - startingRisk
+    fun part1(input: List<String>): Int {
+        val cave = ChitinCave(input)
+        val startCoordinate = Coordinate(cave.maxX, cave.maxY)
+        val startRisk = cave[startCoordinate]
+        val initialNode = Node(startCoordinate, startRisk, listOf(startCoordinate))
+        val nodeLog = NodeLog(cave, initialNode)
+
+        nodeLog.populate()
+        nodeLog.print()
+        return nodeLog.getLowestRisk()
     }
 
     fun part2(input: List<String>): Int {
         return 0
     }
 
-    println(part1(testInput, 2))
-    println(part1(realInput, 3))
+    println(part1(testInput))
+    println(part1(realInput))
 //    println(part2(testInput))
 //    println(part2(realInput))
 }
