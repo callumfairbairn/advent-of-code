@@ -1,4 +1,5 @@
 import com.github.mm.coloredconsole.colored
+import kotlin.math.floor
 
 private val testInput = readInput("Day15_test")
 private val realInput = readInput("Day15")
@@ -19,11 +20,11 @@ fun main() {
     }
 
     class ChitinCave(input: List<String>) {
-        val cave = input.map { row -> row.map { it.toString().toInt() } }
-        val maxX = cave.size - 1
-        val maxY = cave[0].size - 1
-        val xIndices = cave.indices
-        val yIndices = cave[0].indices
+        var cave = input.map { row -> row.map { it.toString().toInt() } }
+        val maxX by lazy { cave.size - 1 }
+        val maxY by lazy { cave[0].size - 1 }
+        val xIndices by lazy { cave.indices }
+        val yIndices by lazy { cave[0].indices }
 
         operator fun get(coord: Coordinate): Int {
             return cave[coord.x][coord.y]
@@ -39,6 +40,26 @@ fun main() {
             )
             return neighbourCoords.filter { it.x in xIndices && it.y in yIndices && !visited.contains(it) }
                 .map { Node(it, this[it] + node.riskOnDiscovery, node.pathOnDiscovery + it) }
+        }
+
+        fun extend() {
+            val initialCave = cave.toList()
+            val additionalAreas = mutableMapOf(0 to initialCave)
+            for (i in 1..100) {
+                val additionalArea = additionalAreas[i - 1]!!.map { row -> row.map {
+                    val newValue = it + 1
+                    if (newValue > 9) 1 else newValue
+                } }
+                additionalAreas[i] = additionalArea
+            }
+            for (i in 1 .. 4) {
+                cave = cave + additionalAreas[i]!!
+            }
+            cave = cave.mapIndexed { x, row ->
+                val modifier = floor(x.toDouble() / initialCave.size).toInt()
+                val rowIndex = x % initialCave.size
+                row + additionalAreas[1 + modifier]!![rowIndex] + additionalAreas[2 + modifier]!![rowIndex] + additionalAreas[3 + modifier]!![rowIndex] + additionalAreas[4 + modifier]!![rowIndex]
+            }
         }
     }
 
@@ -100,11 +121,21 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        val cave = ChitinCave(input)
+        cave.extend()
+        println()
+        val startCoordinate = Coordinate(cave.maxX, cave.maxY)
+        val startRisk = cave[startCoordinate]
+        val initialNode = Node(startCoordinate, startRisk, listOf(startCoordinate))
+        val nodeLog = NodeLog(cave, initialNode)
+
+        nodeLog.populate()
+        nodeLog.print()
+        return nodeLog.getLowestRisk()
     }
 
     println(part1(testInput))
     println(part1(realInput))
-//    println(part2(testInput))
-//    println(part2(realInput))
+    println(part2(testInput))
+    println(part2(realInput))
 }
