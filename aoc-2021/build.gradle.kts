@@ -11,9 +11,20 @@ tasks {
         main {
             java.srcDirs("src")
         }
+        test {
+            java.srcDirs("test")
+        }
     }
 
     wrapper {
         gradleVersion = "8.0"
     }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+dependencies {
+    testImplementation(kotlin("test"))
 }
