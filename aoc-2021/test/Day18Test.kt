@@ -4,37 +4,18 @@ import kotlin.test.assertEquals
 
 internal class TestSFnode() {
     @Test
-    fun testEquals() {
-        assertEquals(SFnode("2"), SFnode("2"))
-        assertEquals(SFnode(SFnode("2"), SFnode("3")), SFnode(SFnode("2"), SFnode("3")))
-    }
-
-    @Test
-    fun testToString() {
-        val one = SFnode("1")
-        val oneTwo = SFnode(one, SFnode("2"))
-        val oneTwoThree = SFnode(oneTwo, SFnode("3"))
-        val oneTwoOneTwo = SFnode(oneTwo, oneTwo)
-        assertEquals("1", one.toString())
-        assertEquals("[1, 2]", oneTwo.toString())
-        assertEquals("[[1, 2], 3]", oneTwoThree.toString())
-        assertEquals("[[1, 2], [1, 2]]", oneTwoOneTwo.toString())
-    }
-
-    @Test
-    fun testParseSnailfish() {
-        assertEquals(SFnode("1"), SFnode("1"))
-        assertEquals(SFnode(SFnode("1"), SFnode("2")), SFnode("[1, 2]"))
-        assertEquals(SFnode(SFnode("1"), SFnode(SFnode("2"), SFnode("3"))), SFnode("[1, [2, 3]]"))
-        assertEquals(SFnode(SFnode(SFnode("1"), SFnode("2")), SFnode("3")), SFnode("[[1, 2], 3]"))
-        assertEquals(SFnode(SFnode(SFnode("1"), SFnode("2")), SFnode(SFnode("3"), SFnode("4"))), SFnode("[[1, 2], [3, 4]]"))
+    fun testParseAndToString() {
+        assertEquals("1", SFnode("1").toString())
+        assertEquals("[1, 2]", SFnode("[1, 2]").toString())
+        assertEquals("[[1, 2], 3]", SFnode("[[1, 2], 3]").toString())
+        assertEquals("[[1, 2], [1, 2]]", SFnode("[[1, 2], [1, 2]]").toString())
     }
 
     @Test
     fun testSplitSnailfish() {
-        assertEquals(SFnode("[2, 3]"), SFnode("5").split())
-        assertEquals(SFnode("[3, 3]"), SFnode("6").split())
-        assertEquals(SFnode("[3, 4]"), SFnode("7").split())
+        assertEquals("[2, 3]", SFnode("5").split().toString())
+        assertEquals("[3, 3]", SFnode("6").split().toString())
+        assertEquals("[3, 4]", SFnode("7").split().toString())
         assertThrows<Exception> {
             SFnode("[2, 3]").split()
         }
@@ -42,11 +23,9 @@ internal class TestSFnode() {
 
     @Test
     fun testSetsUpParent() {
-        val one = SFnode("1")
-        val two = SFnode("2")
-        val oneTwo = SFnode(one, two)
-        assertEquals(oneTwo, one.parent)
-        assertEquals(oneTwo, two.parent)
+        val oneTwo = SFnode("[1, 2]")
+        assertEquals(oneTwo, oneTwo.left?.parent)
+        assertEquals(oneTwo, oneTwo.left?.parent)
     }
 
     @Test
@@ -54,12 +33,12 @@ internal class TestSFnode() {
         val node1 = SFnode("1")
         assertEquals(null, node1.getClosestLeft())
 
-        val node2 = SFnode("2")
-        val nodeA = SFnode(node1, node2)
+        val nodeA = SFnode("[1, 2]")
         assertEquals(null, nodeA.left!!.getClosestLeft())
-        assertEquals(node1, nodeA.right!!.getClosestLeft())
+        assertEquals("1", nodeA.right!!.getClosestLeft().toString())
 
-
+        val nodeB = SFnode("[[3, 4], [5, 6]]")
+//        assert
     }
 
 //    @Test

@@ -12,13 +12,6 @@ class SFnode() {
     var right: SFnode? = null
     var parent: SFnode? = null
 
-    constructor(left: SFnode, right: SFnode) : this() {
-        left.setParent(this)
-        this.left = left
-        right.setParent(this)
-        this.right = right
-    }
-
     constructor(input: String): this() {
         val trimmed = input.trim()
         if (trimmed.startsWith("[")) {
@@ -100,7 +93,7 @@ class SFnode() {
         val half = value!! / 2.0
         val left = floor(half).toInt()
         val right = ceil(half).toInt()
-        return SFnode(SFnode(left.toString()), SFnode(right.toString()))
+        return SFnode("[${left}, ${right}]")
     }
 
     fun getClosestLeft(): SFnode? {
