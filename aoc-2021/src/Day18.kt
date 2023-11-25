@@ -19,10 +19,6 @@ class SFnode() {
         this.right = right
     }
 
-    constructor(value: Int) : this() {
-        this.value = value
-    }
-
     constructor(input: String): this() {
         val trimmed = input.trim()
         if (trimmed.startsWith("[")) {
@@ -97,16 +93,6 @@ class SFnode() {
         return Pair(left, right)
     }
 
-//    fun parse(input: String): SFnode {
-//        val trimmed = input.trim()
-//        if (trimmed.startsWith("[")) {
-//            val stripped = trimmed.substring(1, trimmed.length - 1)
-//            val (left, right) = extractLeftAndRight(stripped)
-//            return SFnode(parse(left), parse(right))
-//        }
-//        return SFnode(trimmed.toInt())
-//    }
-
     fun split(): SFnode {
         if (value == null) {
             throw Exception("Cannot split a branch. Only leaves (which must have a value) can be split.")
@@ -114,7 +100,7 @@ class SFnode() {
         val half = value!! / 2.0
         val left = floor(half).toInt()
         val right = ceil(half).toInt()
-        return SFnode(SFnode(left), SFnode(right))
+        return SFnode(SFnode(left.toString()), SFnode(right.toString()))
     }
 
     fun getClosestLeft(): SFnode? {
