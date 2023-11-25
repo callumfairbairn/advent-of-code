@@ -5,27 +5,36 @@ import kotlin.math.floor
 private val testInput = readInput("Day18_test")
 private val realInput = readInput("Day18")
 
-enum class Side { LEFT, RIGHT }
-
 // SFnode is short for Snailfish node
 class SFnode() {
     var value: Int? = null
     var left: SFnode? = null
     var right: SFnode? = null
     var parent: SFnode? = null
-    private var side: Side? = null
 
     constructor(left: SFnode, right: SFnode) : this() {
         left.setParent(this)
         this.left = left
-        this.left!!.setSide(Side.LEFT)
         right.setParent(this)
         this.right = right
-        this.right!!.setSide(Side.RIGHT)
     }
 
     constructor(value: Int) : this() {
         this.value = value
+    }
+
+    constructor(input: String): this() {
+        val trimmed = input.trim()
+        if (trimmed.startsWith("[")) {
+            val stripped = trimmed.substring(1, trimmed.length - 1)
+            val (left, right) = extractLeftAndRight(stripped)
+            this.left = SFnode(left)
+            this.left!!.setParent(this)
+            this.right = SFnode(right)
+            this.right!!.setParent(this)
+        } else {
+            this.value = trimmed.toInt()
+        }
     }
 
     fun setValue(value: Int): SFnode {
@@ -45,11 +54,6 @@ class SFnode() {
 
     private fun setParent(parent: SFnode): SFnode {
         this.parent = parent
-        return this
-    }
-
-    private fun setSide(side: Side): SFnode {
-        this.side = side
         return this
     }
 
@@ -93,15 +97,15 @@ class SFnode() {
         return Pair(left, right)
     }
 
-    fun parse(input: String): SFnode {
-        val trimmed = input.trim()
-        if (trimmed.startsWith("[")) {
-            val stripped = trimmed.substring(1, trimmed.length - 1)
-            val (left, right) = extractLeftAndRight(stripped)
-            return SFnode(parse(left), parse(right))
-        }
-        return SFnode(trimmed.toInt())
-    }
+//    fun parse(input: String): SFnode {
+//        val trimmed = input.trim()
+//        if (trimmed.startsWith("[")) {
+//            val stripped = trimmed.substring(1, trimmed.length - 1)
+//            val (left, right) = extractLeftAndRight(stripped)
+//            return SFnode(parse(left), parse(right))
+//        }
+//        return SFnode(trimmed.toInt())
+//    }
 
     fun split(): SFnode {
         if (value == null) {

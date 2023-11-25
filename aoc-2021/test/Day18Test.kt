@@ -23,18 +23,18 @@ internal class TestSFnode() {
 
     @Test
     fun testParseSnailfish() {
-        assertEquals(SFnode(1), SFnode().parse("1"))
-        assertEquals(SFnode(SFnode(1), SFnode(2)), SFnode().parse("[1, 2]"))
-        assertEquals(SFnode(SFnode(1), SFnode(SFnode(2), SFnode(3))), SFnode().parse("[1, [2, 3]]"))
-        assertEquals(SFnode(SFnode(SFnode(1), SFnode(2)), SFnode(3)), SFnode().parse("[[1, 2], 3]"))
-        assertEquals(SFnode(SFnode(SFnode(1), SFnode(2)), SFnode(SFnode(3), SFnode(4))), SFnode().parse("[[1, 2], [3, 4]]"))
+        assertEquals(SFnode(1), SFnode("1"))
+        assertEquals(SFnode(SFnode(1), SFnode(2)), SFnode("[1, 2]"))
+        assertEquals(SFnode(SFnode(1), SFnode(SFnode(2), SFnode(3))), SFnode("[1, [2, 3]]"))
+        assertEquals(SFnode(SFnode(SFnode(1), SFnode(2)), SFnode(3)), SFnode("[[1, 2], 3]"))
+        assertEquals(SFnode(SFnode(SFnode(1), SFnode(2)), SFnode(SFnode(3), SFnode(4))), SFnode("[[1, 2], [3, 4]]"))
     }
 
     @Test
     fun testSplitSnailfish() {
-        assertEquals(SFnode().parse("[2, 3]"), SFnode(5).split())
-        assertEquals(SFnode().parse("[3, 3]"), SFnode(6).split())
-        assertEquals(SFnode().parse("[3, 4]"), SFnode(7).split())
+        assertEquals(SFnode("[2, 3]"), SFnode(5).split())
+        assertEquals(SFnode("[3, 3]"), SFnode(6).split())
+        assertEquals(SFnode("[3, 4]"), SFnode(7).split())
         assertThrows<Exception> {
             SFnode(SFnode(2), SFnode(3)).split()
         }
