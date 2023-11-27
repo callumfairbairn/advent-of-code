@@ -6,9 +6,9 @@ private val testInput = readInput("Day18_test")
 private val realInput = readInput("Day18")
 
 class SnailfishAdder(val numbers: List<String>) {
-    fun addAll(): SFnode {
+    fun addAll(): SFNode {
         val queue = LinkedList(numbers)
-        var node = SFnode(queue.pop())
+        var node = SFNode(queue.pop())
         while (queue.isNotEmpty()) {
             node = node.add(queue.pop())
             node.reducer.reduce()
@@ -17,8 +17,8 @@ class SnailfishAdder(val numbers: List<String>) {
     }
 }
 
-class NodeReducer(private val root: SFnode) {
-    fun findNodeToExplode(node: SFnode, depth: Int): SFnode? {
+class NodeReducer(private val root: SFNode) {
+    fun findNodeToExplode(node: SFNode, depth: Int): SFNode? {
         if (node.left == null) {
             return null
         }
@@ -32,7 +32,7 @@ class NodeReducer(private val root: SFnode) {
         return findNodeToExplode(node.right!!, depth + 1)
     }
 
-    fun findNodeToSplit(node: SFnode?): SFnode? {
+    fun findNodeToSplit(node: SFNode?): SFNode? {
         if (node == null) {
             return null
         }
@@ -46,7 +46,7 @@ class NodeReducer(private val root: SFnode) {
         return findNodeToSplit(node.right)
     }
 
-    fun step(): SFnode {
+    fun step(): SFNode {
         val nodeToExplode = findNodeToExplode(root, 0)
         if (nodeToExplode != null) {
             nodeToExplode.explode()
@@ -60,7 +60,7 @@ class NodeReducer(private val root: SFnode) {
         return root
     }
 
-    fun reduce(): SFnode {
+    fun reduce(): SFNode {
         var stable = false
         while (!stable) {
             val prevState = root.toString()
@@ -74,21 +74,19 @@ class NodeReducer(private val root: SFnode) {
 }
 
 // SFnode is short for Snailfish node
-class SFnode() {
+class SFNode(input: String, var parent: SFNode? = null) {
     var value: Int? = null
-    var left: SFnode? = null
-    var right: SFnode? = null
-    var parent: SFnode? = null
+    var left: SFNode? = null
+    var right: SFNode? = null
     var reducer = NodeReducer(this)
 
-    constructor(input: String, parent: SFnode? = null): this() {
-        this.parent = parent
+    init {
         val trimmed = input.trim()
         if (trimmed.startsWith("[")) {
             val stripped = trimmed.substring(1, trimmed.length - 1)
             val (left, right) = extractLeftAndRight(stripped)
-            this.left = SFnode(left, this)
-            this.right = SFnode(right, this)
+            this.left = SFNode(left, this)
+            this.right = SFNode(right, this)
         } else {
             this.value = trimmed.toInt()
         }
@@ -126,9 +124,9 @@ class SFnode() {
         return Pair(left, right)
     }
 
-    fun add(value: String): SFnode {
+    fun add(value: String): SFNode {
         if (value.startsWith("[")) {
-            val newParent = SFnode("[${this},${value}]")
+            val newParent = SFNode("[${this},${value}]")
             this.parent = newParent
             return newParent
         }
@@ -136,21 +134,21 @@ class SFnode() {
         return this
     }
 
-    private fun getRightmost(): SFnode {
+    private fun getRightmost(): SFNode {
         if (right == null) {
             return this
         }
         return right!!.getRightmost()
     }
 
-    private fun getLeftmost(): SFnode {
+    private fun getLeftmost(): SFNode {
         if (left == null) {
             return this
         }
         return left!!.getLeftmost()
     }
 
-    fun getClosestLeft(): SFnode? {
+    fun getClosestLeft(): SFNode? {
         if (parent == null) {
             return null
         }
@@ -160,7 +158,7 @@ class SFnode() {
         return parent!!.left!!.getRightmost()
     }
 
-    fun getClosestRight(): SFnode? {
+    fun getClosestRight(): SFNode? {
         if (parent == null) {
             return null
         }
@@ -170,15 +168,15 @@ class SFnode() {
         return parent!!.right!!.getLeftmost()
     }
 
-    fun split(): SFnode {
+    fun split(): SFNode {
         if (value == null) {
             throw Exception("Cannot split a branch. Only leaves (which must have a value) can be split.")
         }
         val half = value!! / 2.0
         val left = floor(half).toInt()
         val right = ceil(half).toInt()
-        this.left = SFnode(left.toString(), this)
-        this.right = SFnode(right.toString(), this)
+        this.left = SFNode(left.toString(), this)
+        this.right = SFNode(right.toString(), this)
         this.value = null
         return this
     }
