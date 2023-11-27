@@ -5,6 +5,77 @@ import kotlin.math.floor
 private val testInput = readInput("Day18_test")
 private val realInput = readInput("Day18")
 
+class SnailfishAdder(val numbers: List<String>) {
+    fun addAll(): SFnode {
+        val queue = LinkedList(numbers)
+        var node = SFnode(queue.pop())
+        while (queue.isNotEmpty()) {
+            node = node.add(queue.pop())
+            NodeReducer(node).reduce()
+        }
+        return node
+    }
+}
+
+class NodeReducer(private val root: SFnode) {
+    // don't need state as root is modified in place
+    var state = root
+
+    fun findNodeToExplode(node: SFnode, depth: Int): SFnode? {
+        if (node.left == null) {
+            return null
+        }
+        if (depth > 3) {
+            return node
+        }
+        val leftNodeToExplode = findNodeToExplode(node.left!!, depth + 1)
+        if (leftNodeToExplode != null) {
+            return leftNodeToExplode
+        }
+        return findNodeToExplode(node.right!!, depth + 1)
+    }
+
+    fun findNodeToSplit(node: SFnode?): SFnode? {
+        if (node == null) {
+            return null
+        }
+        if (node.value != null && node.value!! >= 10) {
+            return node
+        }
+        val leftNodeToSplit = findNodeToSplit(node.left)
+        if (leftNodeToSplit != null) {
+            return leftNodeToSplit
+        }
+        return findNodeToSplit(node.right)
+    }
+
+    fun step(): SFnode {
+        val nodeToExplode = findNodeToExplode(state, 0)
+        if (nodeToExplode != null) {
+            nodeToExplode.explode()
+            return state
+        }
+        val nodeToSplit = findNodeToSplit(state)
+        if (nodeToSplit != null) {
+            nodeToSplit.split()
+            return state
+        }
+        return state
+    }
+
+    fun reduce(): SFnode {
+        var stable = false
+        while (!stable) {
+            val prevState = state.toString()
+            step()
+            if (state.toString() == prevState) {
+                stable = true
+            }
+        }
+        return state
+    }
+}
+
 // SFnode is short for Snailfish node
 class SFnode() {
     var value: Int? = null
@@ -26,21 +97,6 @@ class SFnode() {
         }
     }
 
-    fun setValue(value: Int): SFnode {
-        this.value = value
-        return this
-    }
-
-    fun setLeft(left: SFnode): SFnode {
-        this.left = left
-        return this
-    }
-
-    fun setRight(right: SFnode): SFnode {
-        this.right = right
-        return this
-    }
-
     private fun setParent(parent: SFnode): SFnode {
         this.parent = parent
         return this
@@ -50,15 +106,7 @@ class SFnode() {
         if (value != null) {
             return value.toString()
         }
-        return "[${left.toString()}, ${right.toString()}]"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return other.toString() == toString()
-    }
-
-    override fun hashCode(): Int {
-        return toString().hashCode()
+        return "[${left.toString()},${right.toString()}]"
     }
 
     private fun extractLeftAndRight(string: String): Pair<String, String> {
@@ -78,7 +126,7 @@ class SFnode() {
                 index++
             }
             left = string.substring(0, index)
-            right = string.substring(index + 2).trim()
+            right = string.substring(index + 1).trim()
         } else {
             left = string.substringBefore(",").trim()
             right = string.substringAfter(",").trim()
@@ -86,14 +134,28 @@ class SFnode() {
         return Pair(left, right)
     }
 
-    fun split(): SFnode {
-        if (value == null) {
-            throw Exception("Cannot split a branch. Only leaves (which must have a value) can be split.")
+    fun add(value: String): SFnode {
+        if (value.startsWith("[")) {
+            val newParent = SFnode("[${this},${value}]")
+            this.parent = newParent
+            return newParent
         }
-        val half = value!! / 2.0
-        val left = floor(half).toInt()
-        val right = ceil(half).toInt()
-        return SFnode("[${left}, ${right}]")
+        this.value = this.value?.plus(value.toInt())
+        return this
+    }
+
+    private fun getRightmost(): SFnode {
+        if (right == null) {
+            return this
+        }
+        return right!!.getRightmost()
+    }
+
+    private fun getLeftmost(): SFnode {
+        if (left == null) {
+            return this
+        }
+        return left!!.getLeftmost()
     }
 
     fun getClosestLeft(): SFnode? {
@@ -103,20 +165,67 @@ class SFnode() {
         if (parent!!.left == this) {
             return parent!!.getClosestLeft()
         }
-        return parent!!.left
+        return parent!!.left!!.getRightmost()
     }
 
-//    fun explode(): SFnode {
-//        if (parent?.left != null) {
-//
-//        }
-//        return SFnode(0)
-//    }
+    fun getClosestRight(): SFnode? {
+        if (parent == null) {
+            return null
+        }
+        if (parent!!.right == this) {
+            return parent!!.getClosestRight()
+        }
+        return parent!!.right!!.getLeftmost()
+    }
+
+    fun split(): SFnode {
+        if (value == null) {
+            throw Exception("Cannot split a branch. Only leaves (which must have a value) can be split.")
+        }
+        val half = value!! / 2.0
+        val left = floor(half).toInt()
+        val right = ceil(half).toInt()
+        this.left = SFnode(left.toString())
+        this.left!!.setParent(this)
+        this.right = SFnode(right.toString())
+        this.right!!.setParent(this)
+        this.value = null
+        return this
+    }
+
+    fun explode() {
+        this.left!!.getClosestLeft()?.add(this.left.toString())
+        this.right!!.getClosestRight()?.add(this.right.toString())
+        this.left = null
+        this.right = null
+        this.value = 0
+    }
+
+    fun createReducer(): NodeReducer {
+        return NodeReducer(this)
+    }
+
+    fun getMagnitude(): Int {
+        val leftValue = if (this.left?.value != null) {
+            this.left!!.value!!
+        } else {
+            this.left!!.getMagnitude()
+        }
+        val rightValue = if (this.right?.value != null) {
+            this.right!!.value!!
+        } else {
+            this.right!!.getMagnitude()
+        }
+        return leftValue * 3 + rightValue * 2
+    }
 }
 
 fun main() {
     fun part1(input: List<String>): Int {
-        return 0
+        val adder = SnailfishAdder(input)
+        val result = adder.addAll()
+        result.println()
+        return result.getMagnitude()
     }
 
     fun part2(input: List<String>): Int {
