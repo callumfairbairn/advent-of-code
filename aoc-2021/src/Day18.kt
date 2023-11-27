@@ -11,16 +11,13 @@ class SnailfishAdder(val numbers: List<String>) {
         var node = SFnode(queue.pop())
         while (queue.isNotEmpty()) {
             node = node.add(queue.pop())
-            NodeReducer(node).reduce()
+            node.reducer.reduce()
         }
         return node
     }
 }
 
 class NodeReducer(private val root: SFnode) {
-    // don't need state as root is modified in place
-    var state = root
-
     fun findNodeToExplode(node: SFnode, depth: Int): SFnode? {
         if (node.left == null) {
             return null
@@ -50,29 +47,29 @@ class NodeReducer(private val root: SFnode) {
     }
 
     fun step(): SFnode {
-        val nodeToExplode = findNodeToExplode(state, 0)
+        val nodeToExplode = findNodeToExplode(root, 0)
         if (nodeToExplode != null) {
             nodeToExplode.explode()
-            return state
+            return root
         }
-        val nodeToSplit = findNodeToSplit(state)
+        val nodeToSplit = findNodeToSplit(root)
         if (nodeToSplit != null) {
             nodeToSplit.split()
-            return state
+            return root
         }
-        return state
+        return root
     }
 
     fun reduce(): SFnode {
         var stable = false
         while (!stable) {
-            val prevState = state.toString()
+            val prevState = root.toString()
             step()
-            if (state.toString() == prevState) {
+            if (root.toString() == prevState) {
                 stable = true
             }
         }
-        return state
+        return root
     }
 }
 
@@ -82,24 +79,19 @@ class SFnode() {
     var left: SFnode? = null
     var right: SFnode? = null
     var parent: SFnode? = null
+    var reducer = NodeReducer(this)
 
-    constructor(input: String): this() {
+    constructor(input: String, parent: SFnode? = null): this() {
+        this.parent = parent
         val trimmed = input.trim()
         if (trimmed.startsWith("[")) {
             val stripped = trimmed.substring(1, trimmed.length - 1)
             val (left, right) = extractLeftAndRight(stripped)
-            this.left = SFnode(left)
-            this.left!!.setParent(this)
-            this.right = SFnode(right)
-            this.right!!.setParent(this)
+            this.left = SFnode(left, this)
+            this.right = SFnode(right, this)
         } else {
             this.value = trimmed.toInt()
         }
-    }
-
-    private fun setParent(parent: SFnode): SFnode {
-        this.parent = parent
-        return this
     }
 
     override fun toString(): String {
@@ -185,10 +177,8 @@ class SFnode() {
         val half = value!! / 2.0
         val left = floor(half).toInt()
         val right = ceil(half).toInt()
-        this.left = SFnode(left.toString())
-        this.left!!.setParent(this)
-        this.right = SFnode(right.toString())
-        this.right!!.setParent(this)
+        this.left = SFnode(left.toString(), this)
+        this.right = SFnode(right.toString(), this)
         this.value = null
         return this
     }
@@ -199,10 +189,6 @@ class SFnode() {
         this.left = null
         this.right = null
         this.value = 0
-    }
-
-    fun createReducer(): NodeReducer {
-        return NodeReducer(this)
     }
 
     fun getMagnitude(): Int {

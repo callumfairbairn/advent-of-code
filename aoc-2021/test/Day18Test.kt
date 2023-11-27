@@ -220,7 +220,7 @@ internal class TestNodeReducer() {
         @Test
         fun testStep() {
             val node = SFnode("[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]")
-            val nodeReducer = node.createReducer()
+            val nodeReducer = node.reducer
             // explode
             assertEquals("[[[[0,7],4],[7,[[8,4],9]]],[1,1]]", nodeReducer.step().toString())
             // explode
@@ -241,7 +241,7 @@ internal class TestNodeReducer() {
         @Test
         fun testReduce() {
             val node = SFnode("[[[[[4,3],4],4],[7,[[8,4],9]]],[1,1]]")
-            node.createReducer().reduce()
+            node.reducer.reduce()
             assertEquals("[[[[0,7],4],[[7,8],[6,0]]],[8,1]]", node.toString())
         }
     }
