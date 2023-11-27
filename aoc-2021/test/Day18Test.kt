@@ -26,7 +26,7 @@ internal class TestSFNode() {
     fun testSetsUpParent() {
         val oneTwo = SFNode("[1,2]")
         assertEquals(oneTwo, oneTwo.left?.parent)
-        assertEquals(oneTwo, oneTwo.left?.parent)
+        assertEquals(oneTwo, oneTwo.right?.parent)
     }
 
 

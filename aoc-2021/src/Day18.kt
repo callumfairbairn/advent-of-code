@@ -213,7 +213,20 @@ fun main() {
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        var maxMagnitude = 0
+        for (x in input) {
+            for (y in input) {
+                if (x != y) {
+                    val adder = SnailfishAdder(listOf(x, y))
+                    val result = adder.addAll()
+                    val magnitude = result.getMagnitude()
+                    if (magnitude > maxMagnitude) {
+                        maxMagnitude = magnitude
+                    }
+                }
+            }
+        }
+        return maxMagnitude
     }
 
     println(part1(testInput))
