@@ -3,6 +3,8 @@ import java.math.BigInteger
 import java.security.MessageDigest
 import kotlin.math.floor
 
+val numberRegex = Regex("""\d+""")
+
 /**
  * Reads lines from the given input txt file.
  */

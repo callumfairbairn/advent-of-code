@@ -3,7 +3,6 @@ private val realInput = readInput("Day02")
 
 data class CubeGameSet(var red: Int?, var green: Int?, var blue: Int?)
 
-val numberRegex = Regex("""\d+""")
 val cubeType = Regex("""red|green|blue""")
 
 fun cubeConundrumParser(input: List<String>): List<List<CubeGameSet>> {
