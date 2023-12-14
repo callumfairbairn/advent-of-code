@@ -7,52 +7,85 @@ fun parseEngine(input: List<String>): List<List<String>> {
 
 val symbols = listOf("#", "@", "*", "+", "-", "=", "&", "/", "%", "$", "!", "?")
 
-fun main() {
-    fun part1(input: List<String>): Int {
-        val lineLength = input[0].length
-        val inputHeight = input.size
-        val engine = parseEngine(input)
+class Engine(val input: List<String>) {
+    private val lineLength = input[0].length
+    private val inputHeight = input.size
+    private val engine = parseEngine(input)
 
-        fun indexBordersSymbol(lineIndex: Int, index: Int): Boolean {
-            val toCheck = listOf(
-                Coordinate(lineIndex - 1, index - 1),
-                Coordinate(lineIndex - 1, index),
-                Coordinate(lineIndex - 1, index + 1),
-                Coordinate(lineIndex, index - 1),
-                Coordinate(lineIndex, index),
-                Coordinate(lineIndex, index + 1),
-                Coordinate(lineIndex + 1, index - 1),
-                Coordinate(lineIndex + 1, index),
-                Coordinate(lineIndex + 1, index + 1),
-            )
-            return toCheck.any { coordinate ->
-                if (coordinate.x < 0 || coordinate.x >= lineLength || coordinate.y < 0 || coordinate.y >= inputHeight) {
-                    return@any false
-                }
-                if (engine[coordinate.x][coordinate.y] in symbols) {
-                    return@any true
-                }
-                return@any false
+    fun getSymbol(coord: Coordinate): String {
+        return engine[coord.x][coord.y]
+    }
+
+    private fun symbolCoordBorderingIndex(lineIndex: Int, index: Int): Coordinate? {
+        val toCheck = listOf(
+            Coordinate(lineIndex - 1, index - 1),
+            Coordinate(lineIndex - 1, index),
+            Coordinate(lineIndex - 1, index + 1),
+            Coordinate(lineIndex, index - 1),
+            Coordinate(lineIndex, index),
+            Coordinate(lineIndex, index + 1),
+            Coordinate(lineIndex + 1, index - 1),
+            Coordinate(lineIndex + 1, index),
+            Coordinate(lineIndex + 1, index + 1),
+        )
+        toCheck.forEach { coordinate ->
+            val canCheck = !(coordinate.x < 0 || coordinate.x >= lineLength || coordinate.y < 0 || coordinate.y >= inputHeight)
+            if (canCheck && engine[coordinate.x][coordinate.y] in symbols) {
+                return coordinate
             }
         }
-        fun rangeBordersSymbol(lineIndex: Int, range: IntRange): Boolean {
-            return range.any { indexBordersSymbol(lineIndex, it) }
-        }
+        return null
+    }
 
-        var counter = 0
+    private fun symbolCoordBorderingRange(lineIndex: Int, range: IntRange): Coordinate? {
+        range.forEach { index ->
+            val symbol = symbolCoordBorderingIndex(lineIndex, index)
+            if (symbol != null) {
+                return symbol
+            }
+        }
+        return null
+    }
+
+    fun getNumbersAndAdjacentSymbolCoordinates(onlyIncludeGears: Boolean = false): List<Pair<Int, Coordinate>> {
+        val numbersAndCoordinate = mutableListOf<Pair<Int, Coordinate>>()
         input.forEachIndexed { index, line ->
             val numbersRegexResult = Regex("""\d+""").findAll(line)
             numbersRegexResult.forEach { number ->
-                if (rangeBordersSymbol(index, number.range)) {
-                    counter += number.value.toInt()
+                val symbolCoord = symbolCoordBorderingRange(index, number.range)
+                if (symbolCoord != null) {
+                    val symbol = engine[symbolCoord.x][symbolCoord.y]
+                    if (onlyIncludeGears && symbol != "*") {
+                        return@forEach
+                    }
+                    numbersAndCoordinate.add(Pair(number.value.toInt(), symbolCoord))
                 }
             }
         }
-        return counter
+        return numbersAndCoordinate
+    }
+}
+
+fun main() {
+    fun part1(input: List<String>): Int {
+        val engine = Engine(input)
+
+        return engine.getNumbersAndAdjacentSymbolCoordinates().sumOf{ it.first }
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        val engine = Engine(input)
+
+        val adjacentNumbersAndSymbols = engine.getNumbersAndAdjacentSymbolCoordinates()
+        val gearRatios = mutableMapOf<Coordinate, MutableList<Int>>()
+        adjacentNumbersAndSymbols.forEach { (number, coordinate) ->
+            val isGear = engine.getSymbol(coordinate) == "*"
+            if (isGear) {
+                gearRatios.getOrPut(coordinate) { mutableListOf() }.add(number)
+            }
+        }
+
+        return gearRatios.values.filter { it.size == 2 }.sumOf { it.product() }
     }
 
     println(part1(testInput))
