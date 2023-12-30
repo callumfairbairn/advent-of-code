@@ -12,7 +12,7 @@ tasks {
             java.srcDirs("src")
         }
         test {
-            java.srcDirs("src/test")
+            java.srcDirs("test")
         }
     }
 
