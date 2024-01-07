@@ -38,5 +38,4 @@ internal class TestSourceToDestinationMap {
         assertEquals(21.toBigInteger(), sToDMap.get(9.toBigInteger()))
         assertEquals(10.toBigInteger(), sToDMap.get(10.toBigInteger()))
     }
-
 }

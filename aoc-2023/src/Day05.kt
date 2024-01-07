@@ -4,23 +4,19 @@ private val testInput = readInput("Day05_test")
 private val realInput = readInput("Day05")
 
 class SourceToDestinationMap(private val input: List<String>) {
-    private val rangesToDestinationMap = mutableMapOf<Pair<BigInteger, BigInteger>, (input: BigInteger) -> BigInteger>()
+    private val rangesToDestinationMap = mutableMapOf<ClosedRange<BigInteger>, (input: BigInteger) -> BigInteger>()
 
     init {
         for (instruction in input) {
             val (destination, source, rangeLength) = bigIntRegex(instruction)
-            val range = Pair(source, source + rangeLength)
+            val range = source..source + rangeLength
             rangesToDestinationMap[range] = { input -> input + destination - source }
         }
     }
 
-    private fun inRange(key: BigInteger, range: Pair<BigInteger, BigInteger>): Boolean {
-        return !(key < range.first || key >= range.second)
-    }
-
     fun get(key: BigInteger): BigInteger {
         for ((range, destinationFunction) in rangesToDestinationMap) {
-            if (inRange(key, range)) {
+            if (key in range) {
                 return destinationFunction(key)
             }
         }
@@ -43,11 +39,11 @@ class Parser(private val input: List<String>) {
         }
         val seeds = mutableListOf<BigInteger>()
         for ((start, range) in parsedSeedValues.chunked(2)) {
-//            var counter = start
-//            while (counter < start + range) {
-//                seeds.add(counter)
-//                counter++
-//            }
+            var counter = start
+            while (counter < start + range) {
+                seeds.add(counter)
+                counter++
+            }
         }
         return seeds
     }
@@ -64,30 +60,30 @@ class Parser(private val input: List<String>) {
 }
 
 fun main() {
+    fun processSeed(seed: BigInteger, sourceMaps: List<SourceToDestinationMap>): BigInteger {
+        var currentSeed = seed
+        for (sourceMap in sourceMaps) {
+            currentSeed = sourceMap.get(currentSeed)
+        }
+        return currentSeed
+    }
+
     fun part1(input: List<String>): BigInteger {
         val parser = Parser(input)
-        var currentValues = parser.getSeeds(false)
-        for (sourceMap in parser.sourceMaps) {
-            currentValues.println()
-            currentValues = currentValues.map { sourceMap.get(it) }
-        }
-        currentValues.println()
-        return currentValues.min()
+        val seeds = parser.getSeeds(false)
+        val locations = seeds.map { processSeed(it, parser.sourceMaps) }
+        return locations.min()
     }
 
     fun part2(input: List<String>): BigInteger {
         val parser = Parser(input)
-        var currentValues = parser.getSeeds(true)
-        for (sourceMap in parser.sourceMaps) {
-            currentValues.println()
-            currentValues = currentValues.map { sourceMap.get(it) }
-        }
-        currentValues.println()
-        return currentValues.min()
+        val seeds = parser.getSeeds(true)
+        val locations = seeds.map { processSeed(it, parser.sourceMaps) }
+        return locations.min()
     }
 
-    println(part1(testInput))
-    println(part1(realInput))
-//    println(part2(testInput))
+    println(part1(testInput) == 35.toBigInteger())
+    println(part1(realInput) == 174137457.toBigInteger())
+    println(part2(testInput) == 46.toBigInteger())
 //    println(part2(realInput))
 }
