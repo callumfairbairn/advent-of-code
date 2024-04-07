@@ -79,3 +79,20 @@ infix fun Int.toward(to: Int): IntProgression {
     val step = if (this > to) -1 else 1
     return IntProgression.fromClosedRange(this, to, step)
 }
+
+// return overlapping range of two ranges
+fun ClosedRange<BigInteger>.overlap(other: ClosedRange<BigInteger>): ClosedRange<BigInteger>? {
+    val start = maxOf(start, other.start)
+    val endInclusive = minOf(endInclusive, other.endInclusive)
+    return if (start <= endInclusive) start..endInclusive else null
+}
+
+fun ClosedRange<BigInteger>.sliceByRange(other: ClosedRange<BigInteger>): List<ClosedRange<BigInteger>?> {
+    val overlappingRange = overlap(other) ?: return listOf(this)
+    val first: ClosedRange<BigInteger>? =
+        if (start < overlappingRange.start) start..overlappingRange.start - 1.toBigInteger() else null
+    val overlap = overlappingRange.start..overlappingRange.endInclusive
+    val second: ClosedRange<BigInteger>? =
+        if (endInclusive > overlappingRange.endInclusive) overlappingRange.endInclusive + 1.toBigInteger()..endInclusive else null
+    return listOf(first, overlap, second)
+}
