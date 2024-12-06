@@ -5,9 +5,7 @@ import kotlin.math.floor
 
 val numberRegex = Regex("""\d+""")
 
-fun numberRegex(string: String): List<Int> {
-    return numberRegex.findAll(string).map { it.value.toInt() }.toList()
-}
+fun String.numberRegex() = numberRegex.findAll(this).map { it.value.toInt() }.toList()
 
 fun bigIntRegex(string: String): List<BigInteger> {
     return numberRegex.findAll(string).map { it.value.toBigInteger() }.toList()

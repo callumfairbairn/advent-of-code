@@ -2,3 +2,9 @@
 **/.idea
 build
 **/src/**/*.txt
+
+# Java
+aoc-2024/target/
+**/!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
