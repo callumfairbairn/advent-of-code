@@ -22,29 +22,29 @@ public class Day01Test {
 
   @Test
   void part1TestInput() {
-    var day = new Day01();
-    var result = day.part1(testInput);
-    assertEquals(0, result);
+    var day = new Day01(testInput);
+    var result = day.part1();
+    assertEquals(11, result);
   }
 
   @Test
   void part1RealInput()  {
-    var day = new Day01();
-    var result = day.part1(realInput);
-    assertEquals(0, result);
+    var day = new Day01(realInput);
+    var result = day.part1();
+    assertEquals(1341714, result);
   }
 
   @Test
   void part2TestInput()  {
-    var day = new Day01();
-    var result = day.part2(testInput);
+    var day = new Day01(testInput);
+    var result = day.part2();
     assertEquals(0, result);
   }
 
   @Test
   void part2RealInput()  {
-    var day = new Day01();
-    var result = day.part2(realInput);
+    var day = new Day01(realInput);
+    var result = day.part2();
     assertEquals(0, result);
   }
 }
