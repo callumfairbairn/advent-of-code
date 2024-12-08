@@ -38,13 +38,13 @@ public class Day01Test {
   void part2TestInput()  {
     var day = new Day01(testInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(31, result);
   }
 
   @Test
   void part2RealInput()  {
     var day = new Day01(realInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(27384707, result);
   }
 }

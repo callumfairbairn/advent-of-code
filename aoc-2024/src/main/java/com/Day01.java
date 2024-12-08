@@ -1,8 +1,11 @@
 package com;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
+import static com.Utils.println;
 import static java.lang.Math.abs;
 
 public class Day01 {
@@ -21,17 +24,33 @@ public class Day01 {
     });
   }
 
+  private HashMap<Integer, Integer> createCounterMap(List<Integer> list) {
+    var map = new HashMap<Integer, Integer>();
+    list.forEach(num -> {
+      map.compute(num, (k, v) -> v == null ? 1 : v + 1);
+    });
+    return map;
+  }
+
   public int part1() {
     list1.sort(null);
     list2.sort(null);
-    var counter = 0;
+    var total = 0;
     for (var i = 0; i < list1.size(); i++) {
-      counter += abs(list1.get(i) - list2.get(i));
+      total += abs(list1.get(i) - list2.get(i));
     }
-    return counter;
+    return total;
   }
 
   public int part2() {
-    return 0;
+    var counterMap2 = createCounterMap(list2);
+    var total = 0;
+
+    for (Integer integer : list1) {
+      var toAdd = counterMap2.getOrDefault(integer, 0) * integer;
+      total += toAdd;
+    }
+
+    return total;
   }
 }
