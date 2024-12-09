@@ -1,4 +1,4 @@
-import com.Day01;
+import com.Day02;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,28 +21,28 @@ public class Day02Test {
 
   @Test
   void part1TestInput() {
-    var day = new Day01(testInput);
+    var day = new Day02(testInput);
     var result = day.part1();
-    assertEquals(0, result);
+    assertEquals(2, result);
   }
 
   @Test
   void part1RealInput() {
-    var day = new Day01(realInput);
+    var day = new Day02(realInput);
     var result = day.part1();
     assertEquals(0, result);
   }
 
   @Test
   void part2TestInput() {
-    var day = new Day01(testInput);
+    var day = new Day02(testInput);
     var result = day.part2();
     assertEquals(0, result);
   }
 
   @Test
   void part2RealInput() {
-    var day = new Day01(realInput);
+    var day = new Day02(realInput);
     var result = day.part2();
     assertEquals(0, result);
   }
