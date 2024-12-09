@@ -3,14 +3,12 @@ package com;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
-import static com.Utils.println;
 import static java.lang.Math.abs;
 
 public class Day01 {
-  private List<Integer> list1 = new ArrayList<>();
-  private List<Integer> list2 = new ArrayList<>();
+  private final List<Integer> list1 = new ArrayList<>();
+  private final List<Integer> list2 = new ArrayList<>();
 
   public Day01(List<String> input) {
     parseInput(input);
