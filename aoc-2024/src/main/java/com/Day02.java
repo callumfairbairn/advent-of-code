@@ -3,7 +3,6 @@ package com;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Day02 {
   List<List<Integer>> reports = new ArrayList<>();
@@ -14,7 +13,7 @@ public class Day02 {
 
   void parseInput(List<String> input) {
     input.forEach(line -> {
-      var ints = Arrays.stream(line.split(" ")).map(Integer::parseInt).collect(Collectors.toList());
+      var ints = Arrays.stream(line.split(" ")).map(Integer::parseInt).toList();
       reports.add(ints);
     });
   }
@@ -25,9 +24,7 @@ public class Day02 {
     var current = iterator.next();
     while (iterator.hasNext()) {
       var next = iterator.next();
-      if (Math.abs(current - next) > 3) {
-        return false;
-      }
+      if (Math.abs(current - next) > 3) return false;
       if (increasing && next <= current) return false;
       if (!increasing && next >= current) return false;
       current = next;
@@ -36,7 +33,7 @@ public class Day02 {
   }
 
   public int part1() {
-    var reportsSafety = reports.stream().map(this::reportIsSafe).collect(Collectors.toList());
+    var reportsSafety = reports.stream().map(this::reportIsSafe).toList();
     return reportsSafety.stream().mapToInt(safe -> safe ? 1 : 0).sum();
   }
 

@@ -30,7 +30,7 @@ public class Day02Test {
   void part1RealInput() {
     var day = new Day02(realInput);
     var result = day.part1();
-    assertEquals(0, result);
+    assertEquals(402, result);
   }
 
   @Test
