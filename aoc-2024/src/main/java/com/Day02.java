@@ -18,18 +18,36 @@ public class Day02 {
     });
   }
 
-  private boolean reportIsSafe(List<Integer> report) {
+  private int calculateReportIsSafe(List<Integer> report) {
     var increasing = report.get(0) < report.get(1);
-    var iterator = report.iterator();
-    var current = iterator.next();
-    while (iterator.hasNext()) {
-      var next = iterator.next();
-      if (Math.abs(current - next) > 3) return false;
-      if (increasing && next <= current) return false;
-      if (!increasing && next >= current) return false;
+    var current = report.get(0);
+    for (var i = 1; i < report.size(); i++) {
+      var next = report.get(i);
+      if (Math.abs(current - next) > 3) return i;
+      if (increasing && next <= current) return i;
+      if (!increasing && next >= current) return i;
       current = next;
     }
-    return true;
+    return -1;
+  }
+
+  private boolean reportIsSafe(List<Integer> report) {
+    return calculateReportIsSafe(report) == -1;
+  }
+
+  private boolean reportIsSafeWithDampening(List<Integer> report) {
+    var result = calculateReportIsSafe(report);
+    if (result == -1) return true;
+
+    for (var i = -2; i < 3; i++) {
+      var newList = new ArrayList<>(report);
+      if (result + i >= 0 && result + i < report.size()) {
+        newList.remove(result + i);
+        var newResult = calculateReportIsSafe(newList);
+        if (newResult == -1) return true;
+      }
+    }
+    return false;
   }
 
   public int part1() {
@@ -38,6 +56,7 @@ public class Day02 {
   }
 
   public int part2() {
-    return 0;
+    var reportsSafety = reports.stream().map(this::reportIsSafeWithDampening).toList();
+    return reportsSafety.stream().mapToInt(safe -> safe ? 1 : 0).sum();
   }
 }
