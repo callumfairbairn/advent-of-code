@@ -23,27 +23,27 @@ public class Day04Test {
   void part1TestInput() {
     var day = new Day04(testInput);
     var result = day.part1();
-    assertEquals(0, result);
+    assertEquals(18, result);
   }
 
   @Test
   void part1RealInput() {
     var day = new Day04(realInput);
     var result = day.part1();
-    assertEquals(0, result);
+    assertEquals(2530, result);
   }
 
   @Test
   void part2TestInput() {
     var day = new Day04(testInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(9, result);
   }
 
   @Test
   void part2RealInput() {
     var day = new Day04(realInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(1921, result);
   }
 }

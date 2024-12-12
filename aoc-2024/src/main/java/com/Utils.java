@@ -1,5 +1,4 @@
 package com;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
@@ -14,7 +13,11 @@ public class Utils {
     return Files.readAllLines(Paths.get("src/main/resources/" + name + ".txt"));
   }
 
-  public static void println(Object o) {
-    System.out.println(o);
+  public static void println(Object ...objects) {
+    for (Object obj : objects) {
+      System.out.print(obj);
+      System.out.print(" ");
+    }
+    System.out.print("\n");
   }
 }

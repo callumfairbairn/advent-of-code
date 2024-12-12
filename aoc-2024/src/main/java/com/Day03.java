@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 
-import static com.Utils.println;
-
 public class Day03 {
   public Day03(List<String> input) {
     parseInput(input);
