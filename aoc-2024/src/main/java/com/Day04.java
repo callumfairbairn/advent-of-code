@@ -1,12 +1,9 @@
 package com;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import static com.Utils.println;
 
 public class Day04 {
   List<List<String>> grid = new ArrayList<>();
