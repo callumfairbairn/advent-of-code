@@ -39,14 +39,14 @@ public class Day05 {
     return Integer.parseInt(update.get((int) midpoint));
   }
 
-  int valid(List<String> update) {
+  int getInvalidIndex(List<String> update) {
     var counter = 0;
     Set<String> seen = new HashSet<>();
+
     for (String item : update) {
       var correspondingRules = rules.get(item);
-      if (correspondingRules != null && correspondingRules.stream().anyMatch(seen::contains)) {
-        return counter;
-      }
+      if (correspondingRules != null && correspondingRules.stream().anyMatch(seen::contains)) return counter;
+
       seen.add(item);
       counter++;
     }
@@ -56,14 +56,14 @@ public class Day05 {
   public int part1() {
     var total = 0;
     for (List<String> update : updates) {
-      if (valid(update) == -1) {
+      if (getInvalidIndex(update) == -1) {
         total += mid(update);
       }
     }
     return total;
   }
 
-  List<String> swapIndexToLeft(List<String> update, int index) {
+  List<String> duplicateAndSwap(List<String> update, int index) {
     var updateCopy = new LinkedList<>(update);
     Collections.swap(updateCopy, index, index - 1);
     return updateCopy;
@@ -74,11 +74,13 @@ public class Day05 {
 
     for (List<String> update : updates) {
       var newUpdate = update;
-      var validityResult = valid(update);
-      if (validityResult ==  -1) continue;
-      while (validityResult != -1) {
-        newUpdate = swapIndexToLeft(newUpdate, validityResult);
-        validityResult = valid(newUpdate);
+      var invalidIndex = getInvalidIndex(update);
+
+      if (invalidIndex ==  -1) continue;
+
+      while (invalidIndex != -1) {
+        newUpdate = duplicateAndSwap(newUpdate, invalidIndex);
+        invalidIndex = getInvalidIndex(newUpdate);
       }
       total += mid(newUpdate);
     }
