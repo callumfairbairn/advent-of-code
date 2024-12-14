@@ -30,20 +30,20 @@ public class Day05Test {
   void part1RealInput() {
     var day = new Day05(realInput);
     var result = day.part1();
-    assertEquals(0, result);
+    assertEquals(6034, result);
   }
 
   @Test
   void part2TestInput() {
     var day = new Day05(testInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(123, result);
   }
 
   @Test
   void part2RealInput() {
     var day = new Day05(realInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(6305, result);
   }
 }

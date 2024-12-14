@@ -34,34 +34,54 @@ public class Day05 {
     }
   }
 
-   int mid(List<String> update) {
+  int mid(List<String> update) {
     var midpoint = Math.floor((double) update.size() / 2);
     return Integer.parseInt(update.get((int) midpoint));
-   }
+  }
 
-   boolean valid(List<String> update) {
-     Set<String> seen = new HashSet<>();
-     for (String item : update ) {
-       var correspondingRules = rules.get(item);
-       if (correspondingRules != null && correspondingRules.stream().anyMatch(seen::contains)) {
-         return false;
-       };
-       seen.add(item);
-     }
-     return true;
-   }
+  int valid(List<String> update) {
+    var counter = 0;
+    Set<String> seen = new HashSet<>();
+    for (String item : update) {
+      var correspondingRules = rules.get(item);
+      if (correspondingRules != null && correspondingRules.stream().anyMatch(seen::contains)) {
+        return counter;
+      }
+      seen.add(item);
+      counter++;
+    }
+    return -1;
+  }
 
   public int part1() {
     var total = 0;
     for (List<String> update : updates) {
-      if (valid(update)) {
+      if (valid(update) == -1) {
         total += mid(update);
       }
     }
     return total;
   }
 
+  List<String> swapIndexToLeft(List<String> update, int index) {
+    var updateCopy = new LinkedList<>(update);
+    Collections.swap(updateCopy, index, index - 1);
+    return updateCopy;
+  }
+
   public int part2() {
-    return 0;
+    var total = 0;
+
+    for (List<String> update : updates) {
+      var newUpdate = update;
+      var validityResult = valid(update);
+      if (validityResult ==  -1) continue;
+      while (validityResult != -1) {
+        newUpdate = swapIndexToLeft(newUpdate, validityResult);
+        validityResult = valid(newUpdate);
+      }
+      total += mid(newUpdate);
+    }
+    return total;
   }
 }
