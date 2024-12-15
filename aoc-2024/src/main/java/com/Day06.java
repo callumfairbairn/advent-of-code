@@ -4,12 +4,15 @@ import java.util.*;
 
 import static com.Utils.println;
 
-enum Direction { UP, DOWN, LEFT, RIGHT }
+enum Direction {UP, DOWN, LEFT, RIGHT}
 
 public class Day06 {
   List<LinkedList<String>> grid = new ArrayList<>();
   Coord pos;
   Direction currentDir = Direction.UP;
+  Set<Coord> seen = new HashSet<>();
+  Set<Coord> loopOptions = new HashSet<>();
+
   Map<Direction, Coord> nextPosModifier = Map.of(
           Direction.UP, new Coord(-1, 0),
           Direction.DOWN, new Coord(1, 0),
@@ -60,8 +63,36 @@ public class Day06 {
     }
   }
 
-  public int part1() {
-    Set<Coord> seen = new HashSet<>();
+  private void checkForLoopOption() {
+    switch (currentDir) {
+      case UP -> {
+        var coordToCheck = pos.plus(new Coord(0, 1));
+        if (getChar(coordToCheck).equals(directionToChar.get(Direction.RIGHT))) {
+          loopOptions.add(coordToCheck);
+        }
+      }
+      case RIGHT -> {
+        var coordToCheck = pos.plus(new Coord(1, 0));
+        if (getChar(coordToCheck).equals(directionToChar.get(Direction.DOWN))) {
+          loopOptions.add(coordToCheck);
+        }
+      }
+      case DOWN -> {
+        var coordToCheck = pos.plus(new Coord(0, -1));
+        if (getChar(coordToCheck).equals(directionToChar.get(Direction.LEFT))) {
+          loopOptions.add(coordToCheck);
+        }
+      }
+      case LEFT -> {
+        var coordToCheck = pos.plus(new Coord(-1, 0));
+        if (getChar(coordToCheck).equals(directionToChar.get(Direction.UP))) {
+          loopOptions.add(coordToCheck);
+        }
+      }
+    }
+  }
+
+  private void simulateUntilOutOfBounds() {
     seen.add(pos);
     while (inBounds(pos)) {
       if (getChar(pos).equals("#")) {
@@ -69,15 +100,21 @@ public class Day06 {
         seen.remove(pos);
         pos = pos.minus(nextPosModifier.get(currentDir));
         currentDir = nextDir.get(currentDir);
-      };
+      }
+      checkForLoopOption();
+      grid.get(pos.x()).set(pos.y(), directionToChar.get(currentDir)); // Save direction in grid
       pos = pos.plus(nextPosModifier.get(currentDir));
       seen.add(pos);
     }
-    printGrid();
+  }
+
+  public int part1() {
+    simulateUntilOutOfBounds();
     return seen.size() - 1;
   }
 
   public int part2() {
-    return 0;
+    simulateUntilOutOfBounds();
+    return loopOptions.size();
   }
 }

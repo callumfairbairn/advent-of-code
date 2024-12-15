@@ -37,7 +37,7 @@ public class Day06Test {
   void part2TestInput() {
     var day = new Day06(testInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(6, result);
   }
 
   @Test
