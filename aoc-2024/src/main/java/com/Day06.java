@@ -62,6 +62,7 @@ public class Day06 {
 
   public int part1() {
     Set<Coord> seen = new HashSet<>();
+    seen.add(pos);
     while (inBounds(pos)) {
       if (getChar(pos).equals("#")) {
         // We hit a wall so step back and change direction
@@ -69,7 +70,6 @@ public class Day06 {
         pos = pos.minus(nextPosModifier.get(currentDir));
         currentDir = nextDir.get(currentDir);
       };
-      grid.get(pos.x()).set(pos.y(), directionToChar.get(currentDir));
       pos = pos.plus(nextPosModifier.get(currentDir));
       seen.add(pos);
     }
