@@ -10,7 +10,7 @@ public class Day06 {
   List<LinkedList<String>> grid = new ArrayList<>();
   Coord pos;
   Direction currentDir = Direction.UP;
-  Set<Coord> seen = new HashSet<>();
+  Map<Coord, LinkedList<Direction>> seen = new HashMap<>();
   Set<Coord> loopOptions = new HashSet<>();
 
   Map<Direction, Coord> nextPosModifier = Map.of(
@@ -24,12 +24,6 @@ public class Day06 {
           Direction.RIGHT, Direction.DOWN,
           Direction.DOWN, Direction.LEFT,
           Direction.LEFT, Direction.UP
-  );
-  Map<Direction, String> directionToChar = Map.of(
-          Direction.UP, "^",
-          Direction.RIGHT, ">",
-          Direction.DOWN, "∨",
-          Direction.LEFT, "<"
   );
 
   public Day06(List<String> input) {
@@ -54,67 +48,56 @@ public class Day06 {
     return grid.get(coord.x()).get(coord.y());
   }
 
-  private void printGrid() {
-    for (List<String> line : grid) {
-      for (String str : line) {
-        System.out.print(str);
-      }
-      println();
+  private void saveSeen() {
+    if (seen.containsKey(pos)) {
+      seen.get(pos).add(currentDir);
+    } else {
+      seen.put(pos, new LinkedList<>(List.of(currentDir)));
     }
   }
 
-  private void checkForLoopOption() {
-    switch (currentDir) {
-      case UP -> {
-        var coordToCheck = pos.plus(new Coord(0, 1));
-        if (getChar(coordToCheck).equals(directionToChar.get(Direction.RIGHT))) {
-          loopOptions.add(coordToCheck);
-        }
-      }
-      case RIGHT -> {
-        var coordToCheck = pos.plus(new Coord(1, 0));
-        if (getChar(coordToCheck).equals(directionToChar.get(Direction.DOWN))) {
-          loopOptions.add(coordToCheck);
-        }
-      }
-      case DOWN -> {
-        var coordToCheck = pos.plus(new Coord(0, -1));
-        if (getChar(coordToCheck).equals(directionToChar.get(Direction.LEFT))) {
-          loopOptions.add(coordToCheck);
-        }
-      }
-      case LEFT -> {
-        var coordToCheck = pos.plus(new Coord(-1, 0));
-        if (getChar(coordToCheck).equals(directionToChar.get(Direction.UP))) {
-          loopOptions.add(coordToCheck);
-        }
-      }
-    }
+  private boolean inLoop() {
+    return seen.containsKey(pos) && seen.get(pos).contains(currentDir);
   }
 
-  private void simulateUntilOutOfBounds() {
-    seen.add(pos);
+  private void reset() {
+    seen = new HashMap<>();
+  }
+
+  private void simulateUntilOutOfBounds(Coord loopOption) {
+//    saveSeen();
     while (inBounds(pos)) {
-      if (getChar(pos).equals("#")) {
+      if (getChar(pos).equals("#") || pos.equals(loopOption)) {
         // We hit a wall so step back and change direction
         seen.remove(pos);
         pos = pos.minus(nextPosModifier.get(currentDir));
         currentDir = nextDir.get(currentDir);
+//        saveSeen();
       }
-      checkForLoopOption();
-      grid.get(pos.x()).set(pos.y(), directionToChar.get(currentDir)); // Save direction in grid
       pos = pos.plus(nextPosModifier.get(currentDir));
-      seen.add(pos);
+      if (inLoop()) {
+        loopOptions.add(loopOption);
+        reset();
+        return;
+      }
+      saveSeen();
     }
   }
 
   public int part1() {
-    simulateUntilOutOfBounds();
+    simulateUntilOutOfBounds(new Coord(-1, -1));
     return seen.size() - 1;
   }
 
   public int part2() {
-    simulateUntilOutOfBounds();
+    for (var i = 0; i < grid.size(); i++) {
+      for (var j = 0; j < grid.get(i).size(); j++) {
+        var loopOption = new Coord(i, j);
+        if (getChar(loopOption).equals(".")) {
+          simulateUntilOutOfBounds(loopOption);
+        }
+      }
+    }
     return loopOptions.size();
   }
 }
