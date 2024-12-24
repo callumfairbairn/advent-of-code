@@ -37,17 +37,30 @@ public class Day07 {
       var part = parts.get(j);
       if (operator.equals("0")) {
         counter += part;
-      } else {
+      } else if (operator.equals("1")) {
         counter *= part;
+      } else {
+        counter = Long.parseLong(counter.toString() + part.toString());
       }
     }
     return counter;
   }
 
-  public static boolean canCreateResult(Long key, List<Long> parts) {
+  private static final char[] CHARS = "0123456789abcdefghijklmnopqrstuvwxyz".toCharArray();
+
+  static String convertIntToBase(int i, int base){
+    final StringBuilder builder = new StringBuilder();
+    do{
+      builder.append(CHARS[i % base]);
+      i /= base;
+    } while(i > 0);
+    return builder.reverse().toString();
+  }
+
+  public static boolean canCreateResult(Long key, List<Long> parts, int operatorNumber) {
     // use parts.size() - 1 because we only need operators between each part
-    for (var i = 0; i <= Math.pow(2, parts.size() - 1); i++) {
-      var operators = addLeadingZeroes(Long.toBinaryString(i), parts.size() - 1).split("");
+    for (var i = 0; i <= Math.pow(operatorNumber, parts.size() - 1); i++) {
+      var operators = addLeadingZeroes(convertIntToBase(i, operatorNumber), parts.size() - 1).split("");
       var result = calculate(operators, parts);
       if (result.equals(key)) return true;
     }
@@ -57,15 +70,20 @@ public class Day07 {
   public long part1() {
     var counter = 0L;
     for (Map.Entry<Long, List<Long>> entry : requests.entrySet()) {
-      if (canCreateResult(entry.getKey(), entry.getValue())) {
+      if (canCreateResult(entry.getKey(), entry.getValue(), 2)) {
         counter += entry.getKey();
       }
-
     }
     return counter;
   }
 
-  public int part2() {
-    return 0;
+  public long part2() {
+    var counter = 0L;
+    for (Map.Entry<Long, List<Long>> entry : requests.entrySet()) {
+      if (canCreateResult(entry.getKey(), entry.getValue(), 3)) {
+        counter += entry.getKey();
+      }
+    }
+    return counter;
   }
 }

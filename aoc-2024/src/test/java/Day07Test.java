@@ -40,24 +40,24 @@ public class Day07Test {
   void part2TestInput() {
     var day = new Day07(testInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(11387, result);
   }
 
   @Test
   void part2RealInput() {
     var day = new Day07(realInput);
     var result = day.part2();
-    assertEquals(0, result);
+    assertEquals(124060392153684L, result);
   }
 
   @Test
   void canCreateResultTest() {
-    assertFalse(canCreateResult(1L, Arrays.asList(2L, 2L, 2L)));
-    assertTrue(canCreateResult(1L, Arrays.asList(1L, 1L, 1L)));
-    assertTrue(canCreateResult(2L, Arrays.asList(1L, 1L, 1L)));
-    assertTrue(canCreateResult(3L, Arrays.asList(1L, 1L, 1L)));
-    assertFalse(canCreateResult(4L, Arrays.asList(1L, 1L, 1L)));
-    assertFalse(canCreateResult(100L, Arrays.asList(50L, 50L, 2L)));
+    assertFalse(canCreateResult(1L, Arrays.asList(2L, 2L, 2L), 2));
+    assertTrue(canCreateResult(1L, Arrays.asList(1L, 1L, 1L), 2));
+    assertTrue(canCreateResult(2L, Arrays.asList(1L, 1L, 1L), 2));
+    assertTrue(canCreateResult(3L, Arrays.asList(1L, 1L, 1L), 2));
+    assertFalse(canCreateResult(4L, Arrays.asList(1L, 1L, 1L), 2));
+    assertFalse(canCreateResult(100L, Arrays.asList(50L, 50L, 2L), 2));
   }
 
   @Test
